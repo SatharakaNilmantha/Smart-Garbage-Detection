@@ -2,62 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Garbage Classification System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Garbage Classification - Upload</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        h1 { margin-bottom: 25px; color: #333; }
+        .upload-box { border: 2px dashed #bbb; padding: 25px; border-radius: 10px; margin-bottom: 20px; }
+        .upload-box:hover { border-color: #3b82f6; }
+        input[type="file"] { cursor: pointer; }
+        .btn { padding: 12px 25px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .btn:hover { background: #2563eb; }
+        .error { color: red; font-weight: bold; margin-top: 15px; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🗂️ Smart Garbage Classifier</h1>
-            <p class="subtitle">Upload an image to classify waste type using AI</p>
-        </header>
-
-        <main>
-            <form id="upload-form" method="POST" enctype="multipart/form-data" class="upload-section">
-                <div class="upload-box">
-                    <div class="upload-icon">📸</div>
-                    <div class="upload-text">Drop your image here or click to browse</div>
-                    <div class="upload-subtext">Supports PNG, JPG, JPEG (max 10MB)</div>
-                    
-                    <div class="file-input-wrapper">
-                        <input type="file" id="file-input" name="file" class="file-input" accept="image/*" required>
-                        <button type="button" class="file-input-button" onclick="document.getElementById('file-input').click()">
-                            Choose File
-                        </button>
-                    </div>
-                </div>
-
-                <div id="selected-file" class="selected-file"></div>
-
-                <button type="submit" id="submit-btn" class="submit-btn">
-                    🔍 Classify Image
-                </button>
-
-                <div id="loading" class="loading">
-                    <div class="spinner"></div>
-                    <p style="margin-top: 10px; color: #667eea;">Processing your image...</p>
-                </div>
-            </form>
-
-            {% if error %}
-                <div class="error">
-                    ⚠️ {{ error }}
-                </div>
-            {% endif %}
-        </main>
-
-        <footer>
-            <a href="/download_report" class="download-btn">
-                📊 Download CSV Report
-            </a>
-        </footer>
+        <h1>Upload Garbage Image</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="upload-box">
+                <input type="file" name="file" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn">Classify</button>
+        </form>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <br>
+        <a href="/download_report" class="btn" style="background:#f97316;">Download CSV Report</a>
     </div>
-
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
