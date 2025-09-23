@@ -1,49 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Garbage Classification - Upload</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7fa;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 500px;
-            margin: 50px auto;
-            background: #fff;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            text-align: center;
-        }
-        h1 { margin-bottom: 25px; color: #333; }
-        .upload-box { border: 2px dashed #bbb; padding: 25px; border-radius: 10px; margin-bottom: 20px; }
-        .upload-box:hover { border-color: #3b82f6; }
-        input[type="file"] { cursor: pointer; }
-        .btn { padding: 12px 25px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; }
-        .btn:hover { background: #2563eb; }
-        .error { color: red; font-weight: bold; margin-top: 15px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Upload Garbage Image</h1>
-        <form method="POST" enctype="multipart/form-data">
-            <div class="upload-box">
-                <input type="file" name="file" accept="image/*" required>
-            </div>
-            <button type="submit" class="btn">Classify</button>
-        </form>
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-        <br>
-        <a href="/download_report" class="btn" style="background:#f97316;">Download CSV Report</a>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="upload-container">
+    <!-- Title Section -->
+    <div class="upload-header">
+        <h1>Garbage Classification</h1>
+        <p>Upload an image to classify garbage using AI</p>
     </div>
-</body>
-</html>
+
+    {% if error %}
+    <div class="error-message">
+        <strong>Error:</strong> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Upload Form -->
+    <form method="POST" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+        <div class="file-input-container">
+            <input type="file" name="file" id="file" accept="image/*" required>
+            <label for="file" class="file-label">
+                <span class="file-button">Choose Image</span>
+                <span class="file-name">No file chosen</span>
+            </label>
+        </div>
+        
+        <button type="submit" class="upload-button" id="uploadButton">
+            <span class="button-text">Classify Image</span>
+            <span class="loading-spinner" style="display: none;">Processing...</span>
+        </button>
+    </form>
+
+    <!-- Tips Section -->
+    <div class="tips-section">
+        <h3>💡 Tips for Best Results</h3>
+        <div class="tips-list">
+            <div class="tip-item">
+                <span class="tip-icon">☀️</span>
+                <span>Use clear, well-lit images</span>
+            </div>
+            <div class="tip-item">
+                <span class="tip-icon">🎯</span>
+                <span>Focus on the garbage item clearly</span>
+            </div>
+            <div class="tip-item">
+                <span class="tip-icon">📷</span>
+                <span>Avoid blurry or distant shots</span>
+            </div>
+            <div class="tip-item">
+                <span class="tip-icon">⚖️</span>
+                <span>Ensure good contrast with background</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('file').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+        document.querySelector('.file-name').textContent = fileName;
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        const button = document.getElementById('uploadButton');
+        const buttonText = button.querySelector('.button-text');
+        const spinner = button.querySelector('.loading-spinner');
+        
+        buttonText.style.display = 'none';
+        spinner.style.display = 'inline';
+        button.disabled = true;
+    });
+</script>
+{% endblock %}

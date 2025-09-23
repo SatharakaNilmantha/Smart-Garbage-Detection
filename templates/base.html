@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garbage Classification System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="nav-logo">♻️ Garbage Classifier</h1>
+                <div class="nav-links">
+                    <a href="{{ url_for('upload_file') }}">Upload Image</a>
+                    <a href="{{ url_for('view_results') }}">View Results</a>
+                    <a href="{{ url_for('download_report') }}">Download Report</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 Garbage Classification System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

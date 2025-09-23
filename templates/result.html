@@ -1,50 +1,245 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Garbage Classification - Result</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7fa;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 500px;
-            margin: 50px auto;
-            background: #fff;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            text-align: center;
-        }
-        h1 { margin-bottom: 20px; color: #333; }
-        .card {
-            background: #f9fafb;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .card img { max-width: 100%; border-radius: 12px; margin-bottom: 15px; }
-        .prediction { font-size: 20px; font-weight: bold; color: #10b981; }
-        .btn { padding: 12px 25px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; text-decoration: none; display: inline-block; }
-        .btn:hover { background: #2563eb; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Prediction Result</h1>
-        <div class="card">
-            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image">
-            <p class="prediction">Predicted: {{ prediction }}</p>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="result-container">
+    <!-- Header Section -->
+    <div class="result-header">
+        <div class="header-content">
+            <h1>Classification Results</h1>
+            <p class="result-subtitle">AI-powered garbage classification analysis</p>
         </div>
-        <a href="/" class="btn">Classify Another Image</a>
-        <br><br>
-        <a href="/download_report" class="btn" style="background:#f97316;">Download CSV Report</a>
+        <a href="{{ url_for('upload_file') }}" class="back-button">
+            <span class="back-icon">←</span>
+            Upload Another Image
+        </a>
     </div>
-</body>
-</html>
+
+    <!-- Main Content Grid -->
+    <div class="result-grid">
+        <!-- Image Section -->
+        <div class="image-section">
+            <div class="section-header">
+                <h3>Uploaded Image</h3>
+                <span class="section-badge">Preview</span>
+            </div>
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="{{ url_for('static', filename='uploads/' + filename) }}" 
+                         alt="Uploaded garbage image" 
+                         class="result-image"
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yMDAgMTUwTDE1MCAxMDBIMjUwTDIwMCAxNTBaIiBmaWxsPSIjQ0RDRENEIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjODg4IiBmb250LXNpemU9IjE0IiBmb250LWZhbWlseT0iQXJpYWwiPkltYWdlIFByZXZpZXc8L3RleHQ+Cjwvc3ZnPgo='">
+                </div>
+                <div class="image-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Filename:</span>
+                        <span class="detail-value">{{ filename }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Uploaded:</span>
+                        <span class="detail-value">{{ now.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Section -->
+        <div class="prediction-section">
+            <div class="section-header">
+                <h3>Classification Result</h3>
+                <span class="section-badge">AI Analysis</span>
+            </div>
+            
+            <!-- Primary Prediction Card -->
+            <div class="prediction-card">
+                <div class="prediction-header">
+                    <div class="prediction-icon">🏷️</div>
+                    <div class="prediction-title">
+                        <h4>Primary Classification</h4>
+                        <p>Most likely garbage category</p>
+                    </div>
+                </div>
+                <div class="prediction-content">
+                    <div class="predicted-class">{{ prediction }}</div>
+                    <div class="confidence-score">
+                        <span class="score-label">Confidence:</span>
+                        <span class="score-value">{{ "%.2f"|format(percentages[prediction]) }}%</span>
+                    </div>
+                </div>
+                <div class="confidence-meter">
+                    <div class="meter-labels">
+                        <span>0%</span>
+                        <span>50%</span>
+                        <span>100%</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" style="width: {{ percentages[prediction]|round(1) }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Predictions -->
+            <div class="all-predictions">
+                <div class="predictions-header">
+                    <h4>Detailed Probability Distribution</h4>
+                    <span class="predictions-count">{{ percentages|length }} classes analyzed</span>
+                </div>
+                <div class="probability-list">
+                    {% for class_name, percentage in percentages.items() %}
+                    <div class="probability-item {% if class_name == prediction %}active{% endif %}">
+                        <div class="class-info">
+                            <span class="class-name">{{ class_name }}</span>
+                            <span class="class-percentage">{{ "%.2f"|format(percentage) }}%</span>
+                        </div>
+                        <div class="probability-bar">
+                            <div class="probability-fill" 
+                                 style="width: {{ percentage|round(1) }}%;
+                                        background: {% if class_name == prediction %} 
+                                        linear-gradient(90deg, #2ecc71, #27ae60) 
+                                        {% else %} 
+                                        linear-gradient(90deg, #3498db, #2980b9) 
+                                        {% endif %};">
+                            </div>
+                        </div>
+                        {% if class_name == prediction %}
+                        <div class="best-match-badge">Best Match</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-section">
+        <h3>Next Steps</h3>
+        <div class="action-buttons">
+            <a href="{{ url_for('download_report') }}" class="action-btn primary-btn">
+                <span class="btn-icon">📊</span>
+                <span class="btn-text">
+                    <strong>Download Full Report</strong>
+                    <small>CSV format with all details</small>
+                </span>
+            </a>
+            
+            <a href="{{ url_for('view_results') }}" class="action-btn secondary-btn">
+                <span class="btn-icon">📋</span>
+                <span class="btn-text">
+                    <strong>View All Results</strong>
+                    <small>Complete classification history</small>
+                </span>
+            </a>
+            
+            <a href="{{ url_for('upload_file') }}" class="action-btn success-btn">
+                <span class="btn-icon">📁</span>
+                <span class="btn-text">
+                    <strong>New Classification</strong>
+                    <small>Upload another image</small>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <h3>Classification Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ "%.2f"|format(percentages[prediction]) }}%</div>
+                    <div class="stat-label">Confidence Score</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    <div class="stat-value">{{ percentages|length }}</div>
+                    <div class="stat-label">Categories Analyzed</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-content">
+                    <div class="stat-value">Real-time</div>
+                    <div class="stat-label">AI Processing</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🤖</div>
+                <div class="stat-content">
+                    <div class="stat-value">EfficientNet</div>
+                    <div class="stat-label">Model Used</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Animate progress bars on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate main confidence meter
+        const meterFill = document.querySelector('.meter-fill');
+        const meterWidth = meterFill.style.width;
+        meterFill.style.width = '0%';
+        
+        setTimeout(() => {
+            meterFill.style.transition = 'width 1s ease-in-out';
+            meterFill.style.width = meterWidth;
+        }, 300);
+        
+        // Animate probability bars with delay
+        const probabilityBars = document.querySelectorAll('.probability-fill');
+        probabilityBars.forEach((bar, index) => {
+            const originalWidth = bar.style.width;
+            bar.style.width = '0%';
+            
+            setTimeout(() => {
+                bar.style.transition = 'width 0.8s ease-in-out';
+                bar.style.width = originalWidth;
+            }, 500 + (index * 100));
+        });
+        
+        // Add hover effects
+        const probabilityItems = document.querySelectorAll('.probability-item');
+        probabilityItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+    });
+    
+    // Export functionality
+    function exportResult() {
+        const resultData = {
+            filename: "{{ filename }}",
+            prediction: "{{ prediction }}",
+            confidence: "{{ '%.2f'|format(percentages[prediction]) }}%",
+            timestamp: "{{ now.strftime('%Y-%m-%d %H:%M:%S') }}",
+            allProbabilities: {{ percentages|tojson }}
+        };
+        
+        const blob = new Blob([JSON.stringify(resultData, null, 2)], { 
+            type: 'application/json' 
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `classification-result-{{ filename }}-{{ now.strftime('%Y%m%d') }}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="results-container">
+    <div class="results-header">
+        <h2>Classification History</h2>
+        <div class="results-stats">
+            <span class="stat-item">Total Classifications: {{ results|length if results else 0 }}</span>
+        </div>
+    </div>
+
+    <div class="results-actions">
+        <a href="{{ url_for('download_report') }}" class="action-button download-btn">
+            📊 Download CSV Report
+        </a>
+        <a href="{{ url_for('upload_file') }}" class="action-button upload-btn">
+            📁 Upload New Image
+        </a>
+        {% if results and results|length > 0 %}
+        <button onclick="clearResults()" class="action-button clear-btn">
+            🗑️ Clear History
+        </button>
+        {% endif %}
+    </div>
+
+    {% if results and results|length > 0 %}
+    <div class="results-controls">
+        <div class="control-group">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by filename or prediction..." 
+                       onkeyup="searchTable()">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <select id="classFilter" onchange="filterTable()" class="filter-select">
+                <option value="">All Classes</option>
+                {% for class_name in class_names %}
+                <option value="{{ class_name }}">{{ class_name }}</option>
+                {% endfor %}
+            </select>
+            
+            <select id="sortSelect" onchange="sortTable()" class="sort-select">
+                <option value="timestamp-desc">Newest First</option>
+                <option value="timestamp-asc">Oldest First</option>
+                <option value="filename-asc">Filename A-Z</option>
+                <option value="filename-desc">Filename Z-A</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="results-table" id="resultsTable">
+            <thead>
+                <tr>
+                    <th class="filename-col">Filename</th>
+                    <th class="prediction-col">Prediction</th>
+                    <th class="timestamp-col">Timestamp</th>
+                    {% for class_name in class_names %}
+                    <th class="percentage-col">{{ class_name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr class="result-row">
+                    <td class="filename-cell">
+                        <div class="file-info">
+                            <span class="file-icon">📄</span>
+                            <span class="filename-text">{{ result.Filename }}</span>
+                        </div>
+                    </td>
+                    <td class="prediction-cell">
+                        <span class="prediction-badge">{{ result.Prediction }}</span>
+                    </td>
+                    <td class="timestamp-cell">{{ result.Timestamp }}</td>
+                    {% for class_name in class_names %}
+                    <td class="percentage-cell">
+                        {% if class_name + '_Percentage' in result %}
+                            {% set perc_str = result[class_name + '_Percentage'] %}
+                            {% set perc = perc_str.replace('%', '')|float %}
+                            <div class="percentage-display-small">
+                                <div class="percentage-bar-small">
+                                    <div class="percentage-fill-small" style="width: {{ perc }}%"></div>
+                                </div>
+                                <span class="percentage-value-small">{{ "%.1f"|format(perc) }}%</span>
+                            </div>
+                        {% else %}
+                            <span class="no-data">-</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination-controls">
+        <div class="pagination-info">
+            Showing <span id="visibleCount">{{ results|length }}</span> of {{ results|length }} results
+        </div>
+        <div class="pagination-buttons">
+            <button onclick="previousPage()" id="prevBtn" class="page-btn" disabled>← Previous</button>
+            <span id="pageInfo" class="page-info">Page 1 of 1</span>
+            <button onclick="nextPage()" id="nextBtn" class="page-btn" disabled>Next →</button>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="no-results">
+        <div class="no-results-icon">📊</div>
+        <h3>No Classification Results Yet</h3>
+        <p>Upload your first image to see the classification results here.</p>
+        <a href="{{ url_for('upload_file') }}" class="action-button upload-btn">Upload Your First Image</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function searchTable() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.result-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const filename = row.querySelector('.filename-text').textContent.toLowerCase();
+            const prediction = row.querySelector('.prediction-badge').textContent.toLowerCase();
+            const isVisible = filename.includes(input) || prediction.includes(input);
+            
+            row.style.display = isVisible ? '' : 'none';
+            if (isVisible) visibleCount++;
+        });
+
+        document.getElementById('visibleCount').textContent = visibleCount;
+        updatePagination();
+    }
+
+    function filterTable() {
+        const filter = document.getElementById('classFilter').value;
+        const rows = document.querySelectorAll('.result-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const prediction = row.querySelector('.prediction-badge').textContent;
+            const isVisible = !filter || prediction === filter;
+            
+            row.style.display = isVisible ? '' : 'none';
+            if (isVisible) visibleCount++;
+        });
+
+        document.getElementById('visibleCount').textContent = visibleCount;
+        updatePagination();
+    }
+
+    function sortTable() {
+        const sortValue = document.getElementById('sortSelect').value;
+        // Add sorting logic here
+        console.log('Sorting by:', sortValue);
+    }
+
+    function updatePagination() {
+        // Simple pagination logic
+        const visibleRows = document.querySelectorAll('.result-row[style=""]');
+        // Implement pagination if needed
+    }
+
+    function previousPage() {
+        // Pagination logic
+    }
+
+    function nextPage() {
+        // Pagination logic
+    }
+
+    function clearResults() {
+        if (confirm('Are you sure you want to clear all results? This action cannot be undone.')) {
+            alert('This feature would clear all results. Currently disabled for demo.');
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add any initialization code here
+    });
+</script>
+{% endblock %}
