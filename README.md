@@ -29,23 +29,14 @@ This repository hosts an innovative solution that leverages artificial intellige
 - **TensorFlow / PyTorch** 🤖
 - **Flask / Django** 🌐
 - **HTML / CSS / JavaScript** 💻
-- **Docker** 🐳 (for containerization)
 - **Raspberry Pi / Edge Devices** (for real-world deployments)
 
 ---
 
 ## 👥 Collaborators
 
-- **Satharaka Nilmantha** ([GitHub](https://github.com/SatharakaNilmantha))
-- **Didula Wijesooriya**
-
----
-
-## 📷 Sample Results
-
-| Input Image | Detected Output |
-|-------------|----------------|
-| ![input_example](assets/input_example.jpg) | ![output_example](assets/output_example.jpg) |
+- <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" width="18" /> **Satharaka Nilmantha** [![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](https://github.com/SatharakaNilmantha)
+- <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" width="18" /> **Didula Wijesooriya** [![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](https://github.com/didula08)
 
 ---
 
@@ -115,8 +106,9 @@ If you'd like to enhance the project, please fork the repo and submit a pull req
 
 ## 📧 Contact
 
-- **Satharaka Nilmantha**: [GitHub](https://github.com/SatharakaNilmantha)
-- **Didula Wijesooriya**: [Email](mailto:didula@example.com) <!-- Update with correct email if desired -->
+- <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" width="18" /> **Satharaka Nilmantha** [![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](https://github.com/SatharakaNilmantha)
+- <img src="https://github.githubassets.com/images/icons/emoji/octocat.png" width="18" /> **Didula Wijesooriya** [![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](https://github.com/didula08)
+<!-- Update with correct email if desired -->
 
 ---
 
